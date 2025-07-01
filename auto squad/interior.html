@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Interior - Auto Squad</title>
+    <link rel="icon" href="logo.webp" type="image/png" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="db.js"></script>
+    <script src="assets/car-icon.js"></script>
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #1e1e1e;
+            --card-bg: #242424;
+            --text-color: #e0e0e0;
+            --primary-color: #3a86ff;
+            --accent-color: #00bfa6;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+        
+        /* Navbar styling */
+        .navbar {
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .navbar .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover,
+        .navbar .nav-link.active {
+            color: var(--primary-color);
+        }
+        
+        .navbar-toggler {
+            border-color: rgba(156, 39, 176, 0.5) !important;
+            background: rgba(156, 39, 176, 0.1);
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(156, 39, 176, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        }
+        
+        /* Main content styling */
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInHeader 1s ease;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+            z-index: 0;
+        }
+        
+        .header h1 {
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .image-gallery {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--card-bg);
+            animation: slideIn 1s ease;
+        }
+        
+        .image-gallery::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .image-gallery::-webkit-scrollbar-track {
+            background: var(--card-bg);
+            border-radius: 10px;
+        }
+        
+        .image-gallery::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        .car-image-container {
+            flex: 0 0 auto;
+            width: 300px;
+            height: 200px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .car-image-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .car-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+        
+        .car-image-container:hover .car-image {
+            transform: scale(1.1);
+        }
+        
+        .description-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            animation: fadeIn 1s ease 0.3s both;
+        }
+        
+        .description {
+            margin: 20px 0;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+        
+        .features {
+            margin: 30px 0;
+            animation: fadeIn 1s ease 0.6s both;
+        }
+        
+        .features h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-align: left;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-item {
+            background: var(--secondary-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .feature-icon i {
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .feature-text {
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 12px 25px;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: white;
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .back-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #8e24aa, #5e35b1);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .back-button:hover::before {
+            width: 100%;
+        }
+        
+        .back-button i {
+            margin-right: 10px;
+        }
+        
+        /* Animated background */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, var(--primary-bg), var(--secondary-bg));
+            overflow: hidden;
+        }
+        
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-40vh) rotate(180deg);
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInHeader {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* 360-degree viewer */
+        .car-viewer-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 30px 0;
+            animation: fadeIn 1s ease 0.9s both;
+        }
+        
+        .car-viewer {
+            width: 100%;
+            height: 100%;
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: background-image 0.2s ease;
+        }
+        
+        .viewer-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .viewer-btn {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .viewer-btn:hover {
+            background-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+            
+            .image-gallery {
+                gap: 10px;
+            }
+            
+            .car-image-container {
+                width: 250px;
+                height: 150px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-background">
+        <div class="particles-container" id="particles-container"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" href="index.html">
+                    <img src="logo.webp" alt="Auto Squad Logo">
+                    <span class="ms-2 text-white">Auto Squad</span>
+                </a>
+                
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item" id="login-nav-item">
+                        <a class="nav-link" aria-current="page" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item" id="admin-login-nav-item">
+                        <a class="nav-link" href="login.html?tab=admin">
+                            <i class="fas fa-user-shield me-1"></i> Admin
+                        </a>
+                    </li>
+                    <li class="nav-item" id="admin-nav-item" style="display: none;">
+                        <a class="nav-link" aria-current="page" href="admin.html">Admin Panel</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="card.html">Buy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="contactus.html">Contact Us</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center" id="user-info" style="display: none !important;">
+                    <span class="me-3 text-white">Welcome, <span id="user-name"></span></span>
+                    <button class="btn btn-outline-danger" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1 id="car-title">Car Interior Details</h1>
+    </div>
+    
+    <div class="container">
+        <!-- Image Gallery -->
+        <div class="image-gallery" id="image-gallery">
+            <!-- Images will be populated by JavaScript -->
+        </div>
+        
+        <!-- Description Card -->
+        <div class="description-card">
+            <h2>About this Interior</h2>
+        <p id="car-description" class="description"></p>
+        </div>
+        
+        <!-- 360 Degree Viewer -->
+        <div class="car-viewer-container">
+            <div class="car-viewer" id="car-viewer"></div>
+            <div class="viewer-controls">
+                <button class="viewer-btn" id="rotate-left">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="viewer-btn" id="rotate-right">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Features -->
+        <div class="features">
+            <h2>Key Features</h2>
+            <div class="features-grid" id="car-features">
+                <!-- Features will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <a href="card.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Car Listings
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate background particles
+            generateParticles();
+            
+            // Check if user is logged in
+            const currentUser = window.DB.auth.getCurrentUser();
+            const userInfo = document.getElementById('user-info');
+            const loginNavItem = document.getElementById('login-nav-item');
+            const adminLoginNavItem = document.getElementById('admin-login-nav-item');
+            const adminNavItem = document.getElementById('admin-nav-item');
+            
+            if (currentUser) {
+                // User is logged in
+                document.getElementById('user-name').textContent = currentUser.name;
+                userInfo.style.display = 'flex !important';
+                loginNavItem.style.display = 'none';
+                adminLoginNavItem.style.display = 'none';
+                
+                // Show admin link if the user is an admin
+                if (currentUser.isAdmin) {
+                    adminNavItem.style.display = 'block';
+                }
+                
+                // Add logout functionality
+                document.getElementById('logout-btn').addEventListener('click', function() {
+                    window.DB.auth.logout();
+                    window.location.reload();
+                });
+            } else {
+                // User is not logged in
+                userInfo.style.display = 'none !important';
+                loginNavItem.style.display = 'block';
+                adminLoginNavItem.style.display = 'block';
+                adminNavItem.style.display = 'none';
+            }
+            
+            // Car data 
+            const carData = {
+                altis: {
+                title: "Toyota Altis Interior",
+                    mainImage: "altis_interior.jpg",
+                    images: ["altis_interior.jpg", "altis_interior2.jpg", "altis_interior3.jpg"].filter(img => img),
+                    description: "The interior of Toyota Altis offers a comfortable and elegant design with advanced features and premium materials. The cabin is designed to maximize comfort for both driver and passengers, with high-quality materials used throughout. Attention to detail is evident in the fit and finish, creating an atmosphere of quality and refinement.",
+                    features: [
+                        { icon: "chair", text: "Premium Leather Seats" },
+                        { icon: "tv", text: "Touchscreen Infotainment System" },
+                        { icon: "temperature-half", text: "Automatic Climate Control" },
+                        { icon: "ruler", text: "Spacious Legroom" },
+                        { icon: "steering-wheel", text: "Steering-mounted Controls" },
+                        { icon: "music", text: "Premium Audio System" }
+                ]
+            },
+            venue: {
+                title: "Hyundai Venue Interior",
+                    mainImage: "venue_interior.jpg",
+                    images: ["venue_interior.jpg", "venue_interior2.jpg", "venue_interior3.jpg"].filter(img => img),
+                    description: "Hyundai Venue's interior boasts a modern design with smart technology and excellent craftsmanship. The Venue's cabin offers a perfect blend of style, comfort, and technology that exceeds expectations in its segment. Every control is intuitively placed for ease of use, making for a driver-friendly experience.",
+                    features: [
+                        { icon: "sun", text: "Panoramic Sunroof" },
+                        { icon: "battery-full", text: "Wireless Phone Charger" },
+                        { icon: "display", text: "8-inch Infotainment Screen" },
+                        { icon: "wind", text: "Rear AC Vents" },
+                        { icon: "lightbulb", text: "Ambient Lighting" },
+                        { icon: "bluetooth", text: "Bluetooth Connectivity" }
+                    ]
+                },
+                jetta: {
+                title: "Volkswagen Jetta Interior",
+                    mainImage: "jetta_interior.jpg",
+                    images: ["jetta_interior.jpg", "jetta_interior2.jpg", "jetta_interior3.jpg"].filter(img => img),
+                    description: "The Volkswagen Jetta offers a luxurious and ergonomic interior built for comfort and sophistication. German engineering is evident in every aspect of the cabin, from the quality of materials to the precision of assembly. The Jetta's interior provides a perfect balance of comfort, functionality, and style.",
+                    features: [
+                        { icon: "couch", text: "Premium Leather Upholstery" },
+                        { icon: "snowflake", text: "Dual-zone Climate Control" },
+                        { icon: "volume-high", text: "Premium Sound System" },
+                        { icon: "fire", text: "Heated Seats" },
+                        { icon: "box", text: "Ample Storage Space" },
+                        { icon: "gauge", text: "Digital Instrument Cluster" }
+                    ]
+                },
+                benz_s350: {
+                    title: "Mercedes Benz S350L Interior",
+                    mainImage: "benz_interior.jpg",
+                    images: ["benz_interior.jpg", "benz_interior2.jpg", "benz_interior3.jpg"].filter(img => img),
+                    description: "The Mercedes-Benz S350L interior represents the pinnacle of automotive luxury and technology. Every surface, control, and feature has been crafted to the highest standards of quality and design. The cabin provides an oasis of comfort, with materials and finishes that exemplify luxury.",
+                    features: [
+                        { icon: "massage", text: "Massage Seats" },
+                        { icon: "music", text: "Burmester 3D Surround Sound" },
+                        { icon: "lightbulb", text: "64-Color Ambient Lighting" },
+                        { icon: "temperature-arrow-up", text: "4-Zone Climate Control" },
+                        { icon: "display", text: "MBUX Infotainment System" },
+                        { icon: "wood", text: "Premium Wood Trim" }
+                    ]
+                },
+                benz_e250: {
+                    title: "Mercedes Benz E250 Interior",
+                    mainImage: "benz_e_interior.jpg",
+                    images: ["benz_e_interior.jpg", "benz_e_interior2.jpg", "benz_e_interior3.jpg"].filter(img => img),
+                    description: "The E250's interior combines elegant design with advanced technology features for a refined driving experience. The cabin strikes a perfect balance between luxury and performance, creating an environment that feels both sophisticated and dynamic. The attention to detail throughout the interior is a testament to Mercedes-Benz's commitment to quality.",
+                    features: [
+                        { icon: "chair", text: "ARTICO Leather Seats" },
+                        { icon: "display", text: "Widescreen Cockpit" },
+                        { icon: "gauge", text: "Dynamic Drive Modes" },
+                        { icon: "arrows-to-circle", text: "Touchpad Controller" },
+                        { icon: "eye", text: "Driver Assistance Systems" },
+                        { icon: "music", text: "Premium Audio System" }
+                    ]
+                },
+                bmw_5_series: {
+                    title: "BMW 5 Series Interior",
+                    mainImage: "bmw_5_series_interior.jpg",
+                    images: ["bmw_5_series_interior.jpg", "bmw_5_series_interior2.jpg", "bmw_5_series_interior3.jpg"].filter(img => img),
+                    description: "The BMW 5 Series interior exemplifies German luxury with its driver-focused cockpit and premium materials. The cabin offers a perfect blend of comfort, technology, and sporty aesthetics. Every detail has been carefully considered, from the ergonomic layout of controls to the quality of materials used throughout.",
+                    features: [
+                        { icon: "chair", text: "Dakota Leather Upholstery" },
+                        { icon: "tv", text: "iDrive Infotainment System" },
+                        { icon: "sliders", text: "Customizable Ambient Lighting" },
+                        { icon: "microchip", text: "Gesture Control" },
+                        { icon: "volume-high", text: "Harman Kardon Sound System" },
+                        { icon: "gauge", text: "Digital Instrument Cluster" }
+                    ]
+                },
+                harley_750: {
+                    title: "Harley-Davidson Street 750 Features",
+                    mainImage: "harley_750_interior.jpg",
+                    images: ["harley_750_interior.jpg", "harley_750_interior2.jpg"].filter(img => img),
+                    description: "The Harley-Davidson Street 750 offers rider-focused ergonomics with a blend of comfort and control. While not a traditional 'interior', the bike's cockpit provides intuitive controls and essential information displays. The riding position is designed for both urban commuting and highway cruising.",
+                    features: [
+                        { icon: "gauge", text: "Digital-Analog Instrument Panel" },
+                        { icon: "gas-pump", text: "3.5-Gallon Fuel Tank" },
+                        { icon: "chair", text: "Comfortable Solo Seat" },
+                        { icon: "hand-back-fist", text: "Responsive Hand Controls" },
+                        { icon: "wrench", text: "Liquid-Cooled Revolution X Engine" },
+                        { icon: "shield", text: "Standard ABS" }
+                    ]
+                },
+                skoda_yeti: {
+                    title: "Skoda Yeti Interior",
+                    mainImage: "skoda_yeti_interior.jpg",
+                    images: ["skoda_yeti_interior.jpg", "skoda_yeti_interior2.jpg"].filter(img => img),
+                    description: "The Skoda Yeti interior combines practicality with comfort, featuring robust materials and thoughtful design. The cabin offers excellent visibility and a commanding driving position. With its versatile seating arrangements and practical storage solutions, the Yeti balances functionality with a touch of European refinement.",
+                    features: [
+                        { icon: "chair", text: "VarioFlex Seating System" },
+                        { icon: "arrows-maximize", text: "Panoramic Sunroof" },
+                        { icon: "temperature-half", text: "Dual-Zone Climate Control" },
+                        { icon: "display", text: "Touchscreen Infotainment" },
+                        { icon: "box", text: "Clever Storage Solutions" },
+                        { icon: "gauge", text: "Multi-Function Display" }
+                    ]
+                },
+                pajero: {
+                    title: "Mitsubishi Pajero Interior",
+                    mainImage: "pajero_interior.jpg",
+                    images: ["pajero_interior.jpg", "pajero_interior2.jpg"].filter(img => img),
+                    description: "The Mitsubishi Pajero offers a rugged yet comfortable interior that blends durability with convenience. The cabin features a spacious layout with three-row seating and excellent visibility. Built for both off-road adventures and daily commuting, the interior combines practical features with essential comforts.",
+                    features: [
+                        { icon: "chair", text: "Premium Leather Seats" },
+                        { icon: "tv", text: "Touchscreen Navigation System" },
+                        { icon: "snowflake", text: "Automatic Climate Control" },
+                        { icon: "music", text: "Rockford Fosgate Sound System" },
+                        { icon: "ruler", text: "Spacious Third-Row Seating" },
+                        { icon: "steering-wheel", text: "Multi-Function Steering Wheel" }
+                    ]
+                },
+                polo: {
+                    title: "Volkswagen Polo Interior",
+                    mainImage: "polo_interior.jpg",
+                    images: ["polo_interior.jpg", "polo_interior2.jpg"].filter(img => img),
+                    description: "The Volkswagen Polo interior offers a surprisingly premium feel for its segment, with high-quality materials and excellent build quality. The cabin features a clean, functional design with intuitive controls and good ergonomics. Despite its compact exterior, the interior space is well-utilized, providing comfort for both driver and passengers.",
+                    features: [
+                        { icon: "sliders", text: "Adjustable Driver's Seat" },
+                        { icon: "music", text: "Integrated Audio System" },
+                        { icon: "air-conditioner", text: "Effective Climate Control" },
+                        { icon: "speedometer", text: "Multi-Function Trip Computer" },
+                        { icon: "steering-wheel", text: "Leather-Wrapped Steering Wheel" },
+                        { icon: "box", text: "Split-Folding Rear Seats" }
+                    ]
+                },
+                octavia: {
+                    title: "Skoda Octavia Interior",
+                    mainImage: "octavia_interior.jpg",
+                    images: ["octavia_interior.jpg", "octavia_interior2.jpg", "octavia_interior3.jpg"].filter(img => img),
+                    description: "The Skoda Octavia interior showcases European design with premium materials and exceptional build quality. The cabin is spacious and intelligently laid out, offering comfort for all passengers. With its combination of practicality, technology, and refined aesthetics, the Octavia delivers an upscale experience in its segment.",
+                    features: [
+                        { icon: "chair", text: "Premium Leather Upholstery" },
+                        { icon: "sun", text: "Panoramic Sunroof" },
+                        { icon: "display", text: "Touchscreen Infotainment System" },
+                        { icon: "sliders", text: "Dual-Zone Climate Control" },
+                        { icon: "car-rear", text: "Best-in-Class Rear Legroom" },
+                        { icon: "laptop", text: "Virtual Cockpit Display" }
+                    ]
+                },
+                jazz: {
+                    title: "Honda Jazz Interior",
+                    mainImage: "jazz_interior.jpg",
+                    images: ["jazz_interior.jpg", "jazz_interior2.jpg"].filter(img => img),
+                    description: "The Honda Jazz interior exemplifies intelligent space utilization with its versatile 'Magic Seats' and surprisingly roomy cabin. Despite its compact exterior dimensions, the Jazz offers exceptional passenger space and cargo flexibility. The dashboard layout is driver-focused, with intuitive controls and good visibility.",
+                    features: [
+                        { icon: "chair", text: "Magic Seats with Multiple Configurations" },
+                        { icon: "arrows-maximize", text: "Class-Leading Cargo Space" },
+                        { icon: "display", text: "Advanced Infotainment System" },
+                        { icon: "temperature-half", text: "Automatic Climate Control" },
+                        { icon: "ruler", text: "Exceptional Rear Legroom" },
+                        { icon: "gauge", text: "Multi-Information Display" }
+                    ]
+                },
+                ml_350: {
+                    title: "Mercedes-Benz ML 350 Interior",
+                    mainImage: "ml_350_interior.jpg",
+                    images: ["ml_350_interior.jpg", "ml_350_interior2.jpg"].filter(img => img),
+                    description: "The Mercedes-Benz ML 350 interior combines luxury SUV comfort with advanced technology and premium materials. The cabin offers a commanding driving position with excellent visibility and intuitive controls. Every surface, from the wood trim to the leather upholstery, exhibits the meticulous attention to detail that defines the Mercedes-Benz brand.",
+                features: [
+                        { icon: "chair", text: "Premium Leather Seating" },
+                        { icon: "wood", text: "Genuine Wood Trim" },
+                        { icon: "display", text: "COMAND Infotainment System" },
+                        { icon: "temperature-half", text: "3-Zone Climate Control" },
+                        { icon: "music", text: "Harman/Kardon Sound System" },
+                        { icon: "sun", text: "Panoramic Sunroof" }
+                    ]
+                },
+                vento: {
+                    title: "Volkswagen Vento Interior",
+                    mainImage: "vento_interior.jpg",
+                    images: ["vento_interior.jpg", "vento_interior2.jpg"].filter(img => img),
+                    description: "The Volkswagen Vento interior delivers German engineering with clean lines and excellent build quality. The cabin offers a premium feel with good materials and precise assembly. The straightforward layout prioritizes functionality without sacrificing comfort, making it a practical choice for daily driving and longer journeys.",
+                    features: [
+                        { icon: "chair", text: "Leatherette Seat Upholstery" },
+                        { icon: "snowflake", text: "Automatic Climate Control" },
+                        { icon: "music", text: "Integrated Audio System" },
+                        { icon: "ruler", text: "Spacious Rear Legroom" },
+                        { icon: "gauge", text: "Multi-Function Display" },
+                        { icon: "box", text: "Generous Trunk Space" }
+                    ]
+                }
+        };
+
+        // Get car model from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+            const carId = urlParams.get('car');
+
+        // Populate page with data
+            if (carId && carData[carId]) {
+                const car = carData[carId];
+            document.getElementById("car-title").textContent = car.title;
+            document.getElementById("car-description").textContent = car.description;
+
+                // Populate image gallery
+                const gallery = document.getElementById("image-gallery");
+                car.images.forEach(image => {
+                    const container = document.createElement("div");
+                    container.className = "car-image-container";
+                    
+                    const img = document.createElement("img");
+                    img.src = "assets/cars/interiors/" + image;
+                    img.alt = car.title;
+                    img.className = "car-image";
+                    
+                    container.appendChild(img);
+                    gallery.appendChild(container);
+                });
+
+                // Populate features with icons
+            const featuresList = document.getElementById("car-features");
+            car.features.forEach(feature => {
+                    const featureItem = document.createElement("div");
+                    featureItem.className = "feature-item";
+                    
+                    featureItem.innerHTML = `
+                        <div class="feature-icon">
+                            <i class="fas fa-${feature.icon}"></i>
+                        </div>
+                        <div class="feature-text">${feature.text}</div>
+                    `;
+                    
+                    featuresList.appendChild(featureItem);
+                });
+                
+                // Initialize 360 viewer
+                initializeViewer(carId);
+            } else {
+                // If car not found, show error message
+                document.querySelector(".container").innerHTML = `
+                    <div class="description-card">
+                        <h2>Not Found</h2>
+                        <p>The car interior details you're looking for could not be found.</p>
+                        <a href="card.html" class="back-button">
+                            <i class="fas fa-arrow-left"></i> Back to Car Listings
+                        </a>
+                    </div>
+                `;
+            }
+        });
+        
+        // Function to generate particles for background animation
+        function generateParticles() {
+            const container = document.getElementById('particles-container');
+            const numberOfParticles = 30;
+            
+            for (let i = 0; i < numberOfParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 5 and 20 pixels
+                const size = Math.floor(Math.random() * 15) + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random starting position
+                const xPos = Math.floor(Math.random() * 100);
+                const yPos = Math.floor(Math.random() * 100);
+                particle.style.left = `${xPos}%`;
+                particle.style.top = `${yPos}%`;
+                
+                // Random opacity
+                particle.style.opacity = Math.random() * 0.3 + 0.1;
+                
+                // Random animation duration and delay
+                const duration = Math.floor(Math.random() * 20) + 10;
+                const delay = Math.floor(Math.random() * 10);
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Initialize the 360-degree viewer
+        function initializeViewer(carId) {
+            const viewer = document.getElementById('car-viewer');
+            // Set different viewAngles based on car model
+            let viewAngles = 8; // Default number of images for 360 view
+            if (carId === 'pajero' || carId === 'polo' || carId === 'octavia') {
+                viewAngles = 2; // Only 2 images for these models
+            }
+            let currentAngle = 1;
+            
+            // Update the viewer with the current angle
+            function updateViewer() {
+                viewer.style.backgroundImage = `url('assets/cars/interiors/${carId}_interior_360_${currentAngle}.jpg')`;
+            }
+            
+            // Initial setup
+            updateViewer();
+            
+            // Rotate left
+            document.getElementById('rotate-left').addEventListener('click', function() {
+                currentAngle = currentAngle === 1 ? viewAngles : currentAngle - 1;
+                updateViewer();
+            });
+            
+            // Rotate right
+            document.getElementById('rotate-right').addEventListener('click', function() {
+                currentAngle = currentAngle === viewAngles ? 1 : currentAngle + 1;
+                updateViewer();
+            });
+            
+            // Touch and drag support for mobile
+            let startX = 0;
+            let isDragging = false;
+            
+            viewer.addEventListener('mousedown', function(e) {
+                startX = e.clientX;
+                isDragging = true;
+            });
+            
+            viewer.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            });
+            
+            window.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                const diff = e.clientX - startX;
+                if (Math.abs(diff) > 30) {
+                    if (diff > 0) {
+                        // Rotate right
+                        currentAngle = currentAngle === viewAngles ? 1 : currentAngle + 1;
+                    } else {
+                        // Rotate left
+                        currentAngle = currentAngle === 1 ? viewAngles : currentAngle - 1;
+                    }
+                    updateViewer();
+                    startX = e.clientX;
+                }
+            });
+            
+            window.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                
+                const diff = e.touches[0].clientX - startX;
+                if (Math.abs(diff) > 30) {
+                    if (diff > 0) {
+                        // Rotate right
+                        currentAngle = currentAngle === viewAngles ? 1 : currentAngle + 1;
+                    } else {
+                        // Rotate left
+                        currentAngle = currentAngle === 1 ? viewAngles : currentAngle - 1;
+                    }
+                    updateViewer();
+                    startX = e.touches[0].clientX;
+                }
+            });
+            
+            window.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+            
+            window.addEventListener('touchend', function() {
+                isDragging = false;
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Stock - Auto Squad</title>
+    <link rel="icon" href="logo.webp" type="image/png" />
+    <link rel="stylesheet" href="card.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="db.js"></script>
+    <script src="assets/car-icon.js"></script>
+    <style>
+        /* Animation styles */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(to bottom, #121212, #1e1e1e);
+            overflow: hidden;
+        }
+        
+        .road-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background-color: #333;
+            overflow: hidden;
+        }
+        
+        .road-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: repeating-linear-gradient(to right, transparent, transparent 20px, #fff 20px, #fff 40px);
+            animation: roadMove 1s linear infinite;
+        }
+        
+        @keyframes roadMove {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: -40px 0;
+            }
+        }
+        
+        .driving-car {
+            position: absolute;
+            bottom: 40px;
+            left: -100px;
+            animation: carDrive 15s linear infinite;
+        }
+        
+        .driving-car:nth-child(2) {
+            bottom: 100px;
+            animation-delay: 5s;
+            transform: scale(0.7);
+            opacity: 0.7;
+        }
+        
+        .driving-car:nth-child(3) {
+            bottom: 150px;
+            animation-delay: 10s;
+            transform: scale(0.5);
+            opacity: 0.5;
+        }
+        
+        @keyframes carDrive {
+            0% {
+                left: -100px;
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                left: 100%;
+                transform: translateY(0);
+            }
+        }
+        
+        .car-shadow {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            filter: blur(10px);
+            animation: shadowPulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes shadowPulse {
+            0%, 100% {
+                transform: translateX(-50%) scaleX(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateX(-50%) scaleX(0.8);
+                opacity: 0.2;
+            }
+        }
+
+        /* Particle effects */
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-25vh) rotate(180deg);
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+            }
+        }
+
+        /* Admin controls for car cards */
+        .car-admin-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .outer:hover .car-admin-controls {
+            opacity: 1;
+        }
+
+        .car-admin-controls button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .car-admin-controls .edit-btn {
+            background: rgba(33, 150, 243, 0.8);
+        }
+
+        .car-admin-controls .delete-btn {
+            background: rgba(244, 67, 54, 0.8);
+        }
+
+        .car-admin-controls button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Add car floating button for admin */
+        .add-car-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3a86ff, #00bfa6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .add-car-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(58, 134, 255, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(58, 134, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(58, 134, 255, 0);
+            }
+        }
+
+        /* Car card hover effect */
+        .outer {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .outer:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Car listing modal styles */
+        .modal-content {
+            background-color: #242424;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header, .modal-footer {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            color: white;
+        }
+
+        .form-control {
+            background-color: #333;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-control:focus {
+            background-color: #3a3a3a;
+            color: white;
+            border-color: #3a86ff;
+            box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
+        }
+
+        .form-label {
+            color: white;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            background-color: #333;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .upload-container {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-container:hover {
+            border-color: #3a86ff;
+            background-color: rgba(58, 134, 255, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-background">
+        <div class="particles-container" id="particles-container"></div>
+        <div class="driving-car">
+            <div class="car-shadow"></div>
+            </div>
+        <div class="driving-car">
+            <div class="car-shadow"></div>
+        </div>
+        <div class="driving-car">
+            <div class="car-shadow"></div>
+            </div>
+        <div class="road-container">
+            <div class="road-line"></div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" href="index.html">
+                    <img src="logo.webp" alt="Auto Squad Logo">
+                    <span class="ms-2 text-white">Auto Squad</span>
+                </a>
+                
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item" id="login-nav-item">
+                        <a class="nav-link" aria-current="page" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item" id="admin-nav-item" style="display: none;">
+                        <a class="nav-link" aria-current="page" href="admin.html">Admin Panel</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="card.html">Buy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="contactus.html">Contact Us</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center" id="user-info" style="display: none !important;">
+                    <span class="me-3 text-white">Welcome, <span id="user-name"></span></span>
+                    <button class="btn btn-outline-danger" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Available Cars</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search-input" placeholder="Search cars...">
+                    <button class="btn" id="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="car-container">
+            <!-- Cars will be rendered here dynamically -->
+        </div>
+    </div>
+
+    <!-- Fixed car icon with animation -->
+    <div class="car-icon" id="back-to-top">
+        <i class="fas fa-car"></i>
+            </div>
+
+    <!-- Admin Add Car Button (hidden by default) -->
+    <div class="add-car-btn" id="add-car-btn" style="display: none;">
+        <i class="fas fa-plus"></i>
+        </div>
+
+    <!-- Car Add/Edit Modal -->
+    <div class="modal fade" id="carModal" tabindex="-1" aria-labelledby="carModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="carModalLabel">Add New Car</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="carForm">
+                        <input type="hidden" id="car-id">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="car-model" class="form-label">Car Model</label>
+                                    <input type="text" class="form-control" id="car-model" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="car-year" class="form-label">Year</label>
+                                    <input type="number" class="form-control" id="car-year" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="car-owner" class="form-label">Owner</label>
+                                    <input type="text" class="form-control" id="car-owner" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="car-km" class="form-label">Kilometers</label>
+                                    <input type="number" class="form-control" id="car-km" required>
+            </div>
+        </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="car-price" class="form-label">Price</label>
+                                    <input type="number" class="form-control" id="car-price" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="car-interior-id" class="form-label">Interior ID</label>
+                                    <input type="text" class="form-control" id="car-interior-id" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Car Image</label>
+                                    <div class="upload-container" id="image-upload-container">
+                                        <div class="upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <p>Click to upload image or drag and drop</p>
+                                        <input type="file" id="car-image-input" style="display: none;" accept="image/*">
+                                    </div>
+                                    <div class="image-preview" id="image-preview">
+                                        <p class="text-muted">No image selected</p>
+            </div>
+        </div>
+            </div>
+        </div>
+                        <div class="mb-3">
+                            <label for="car-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="car-description" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-car-btn">Save Car</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this car? This action cannot be undone.</p>
+                    <input type="hidden" id="delete-car-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Three.js for 3D car generation -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- Update 3D Model Viewer Modal for Three.js canvas -->
+    <div class="modal fade" id="model3DModal" tabindex="-1" aria-labelledby="model3DModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="model3DModalLabel">3D Model Viewer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="model3DContainer" style="height: 500px; background: #eee; display: flex; align-items: center; justify-content: center;">
+            <!-- Three.js canvas will be injected here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate background particles
+            generateParticles();
+            
+            // Add car icons to the animation
+            const drivingCars = document.querySelectorAll('.driving-car');
+            drivingCars.forEach(car => {
+                const carImg = window.carIcon.create();
+                car.prepend(carImg);
+            });
+            
+            // Apply theme
+            if (window.DB && window.DB.theme) {
+                window.DB.theme.initTheme();
+            }
+            
+            // Check if user is logged in
+            const currentUser = window.DB.auth.getCurrentUser();
+            const userInfo = document.getElementById('user-info');
+            const loginNavItem = document.getElementById('login-nav-item');
+            const adminNavItem = document.getElementById('admin-nav-item');
+            const addCarBtn = document.getElementById('add-car-btn');
+            
+            if (currentUser) {
+                // User is logged in
+                document.getElementById('user-name').textContent = currentUser.name;
+                userInfo.style.display = 'flex !important';
+                loginNavItem.style.display = 'none';
+                
+                // Show admin link and add car button if the user is an admin
+                if (currentUser.isAdmin) {
+                    adminNavItem.style.display = 'block';
+                    addCarBtn.style.display = 'flex';
+                    
+                    // Initialize admin functionality
+                    initAdminFeatures();
+                }
+                
+                // Add logout functionality
+                document.getElementById('logout-btn').addEventListener('click', function() {
+                    window.DB.auth.logout();
+                    window.location.reload();
+                });
+            } else {
+                // User is not logged in
+                userInfo.style.display = 'none !important';
+                loginNavItem.style.display = 'block';
+                adminNavItem.style.display = 'none';
+                addCarBtn.style.display = 'none';
+            }
+            
+            // Fix for navbar user info display issue
+            if (userInfo.style.display === 'flex !important') {
+                userInfo.setAttribute('style', 'display: flex !important');
+            }
+            
+            // Render all cars
+            renderCars();
+            
+            // Search functionality
+            document.getElementById('search-btn').addEventListener('click', function() {
+                const searchQuery = document.getElementById('search-input').value.toLowerCase();
+                renderCars(searchQuery);
+            });
+            
+            // Also search when pressing Enter in the search input
+            document.getElementById('search-input').addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    const searchQuery = document.getElementById('search-input').value.toLowerCase();
+                    renderCars(searchQuery);
+                }
+            });
+
+            // Back to top functionality
+            document.getElementById('back-to-top').addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Show/hide back to top button based on scroll position
+            window.addEventListener('scroll', function() {
+                const backToTop = document.getElementById('back-to-top');
+                if (window.scrollY > 300) {
+                    backToTop.style.opacity = '1';
+                } else {
+                    backToTop.style.opacity = '0';
+                }
+            });
+        });
+        
+        // Function to generate particles for background animation
+        function generateParticles() {
+            const container = document.getElementById('particles-container');
+            const numberOfParticles = 30;
+            
+            for (let i = 0; i < numberOfParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 5 and 20 pixels
+                const size = Math.floor(Math.random() * 15) + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random starting position
+                const xPos = Math.floor(Math.random() * 100);
+                const yPos = Math.floor(Math.random() * 100);
+                particle.style.left = `${xPos}%`;
+                particle.style.top = `${yPos}%`;
+                
+                // Random opacity
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                // Random animation duration and delay
+                const duration = Math.floor(Math.random() * 20) + 10;
+                const delay = Math.floor(Math.random() * 10);
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Function to initialize admin features
+        function initAdminFeatures() {
+            // Add Car button click handler
+            document.getElementById('add-car-btn').addEventListener('click', function() {
+                // Clear the form
+                document.getElementById('carForm').reset();
+                document.getElementById('car-id').value = '';
+                document.getElementById('image-preview').innerHTML = '<p class="text-muted">No image selected</p>';
+                
+                // Set modal title to Add New Car
+                document.getElementById('carModalLabel').textContent = 'Add New Car';
+                
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('carModal'));
+                modal.show();
+            });
+            
+            // Save Car button click handler
+            document.getElementById('save-car-btn').addEventListener('click', async function() {
+                const carForm = document.getElementById('carForm');
+                
+                // Basic form validation
+                if (!carForm.checkValidity()) {
+                    carForm.reportValidity();
+                    return;
+                }
+                
+                const carId = document.getElementById('car-id').value;
+                const isEdit = carId !== '';
+                
+                // Get form data
+                const carData = {
+                    model: document.getElementById('car-model').value,
+                    year: parseInt(document.getElementById('car-year').value),
+                    owner: document.getElementById('car-owner').value,
+                    km: parseInt(document.getElementById('car-km').value),
+                    price: parseInt(document.getElementById('car-price').value),
+                    description: document.getElementById('car-description').value,
+                    interiorId: document.getElementById('car-interior-id').value
+                };
+                
+                // Handle image upload if there's a new image
+                const imageInput = document.getElementById('car-image-input');
+                if (imageInput.files.length > 0) {
+                    try {
+                        const file = imageInput.files[0];
+                        const imageFilename = await window.DB.fileUtils.saveImage(file);
+                        if (imageFilename) {
+                            carData.image = imageFilename;
+                        }
+                    } catch (error) {
+                        console.error('Error uploading image:', error);
+                        alert('Failed to upload image. Please try again.');
+                        return;
+                    }
+                }
+                
+                // Save car data
+                if (isEdit) {
+                    // Update existing car
+                    const result = window.DB.cars.update(carId, carData);
+                    if (result) {
+                        // Close modal and refresh car list
+                        bootstrap.Modal.getInstance(document.getElementById('carModal')).hide();
+                        renderCars();
+                        showToast('Car updated successfully!');
+                    } else {
+                        alert('Failed to update car. Please try again.');
+                    }
+                } else {
+                    // Add new car
+                    const result = window.DB.cars.add(carData);
+                    if (result) {
+                        // Close modal and refresh car list
+                        bootstrap.Modal.getInstance(document.getElementById('carModal')).hide();
+                        renderCars();
+                        showToast('New car added successfully!');
+                    } else {
+                        alert('Failed to add car. Please try again.');
+                    }
+                }
+            });
+            
+            // Image upload handlers
+            const imageUploadContainer = document.getElementById('image-upload-container');
+            const imageInput = document.getElementById('car-image-input');
+            
+            imageUploadContainer.addEventListener('click', function() {
+                imageInput.click();
+            });
+            
+            imageInput.addEventListener('change', function() {
+                handleImagePreview(this);
+            });
+            
+            // Drag and drop for image upload
+            imageUploadContainer.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#3a86ff';
+                this.style.backgroundColor = 'rgba(58, 134, 255, 0.1)';
+            });
+            
+            imageUploadContainer.addEventListener('dragleave', function() {
+                this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                this.style.backgroundColor = 'transparent';
+            });
+            
+            imageUploadContainer.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                this.style.backgroundColor = 'transparent';
+                
+                if (e.dataTransfer.files.length) {
+                    imageInput.files = e.dataTransfer.files;
+                    handleImagePreview(imageInput);
+                }
+            });
+            
+            // Handle delete confirmation
+            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+                const carId = document.getElementById('delete-car-id').value;
+                if (carId) {
+                    const result = window.DB.cars.delete(carId);
+                    if (result) {
+                        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                        renderCars();
+                        showToast('Car deleted successfully!');
+                    } else {
+                        alert('Failed to delete car. Please try again.');
+                    }
+                }
+            });
+        }
+        
+        // Function to handle image preview
+        function handleImagePreview(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const previewContainer = document.getElementById('image-preview');
+                    previewContainer.innerHTML = '';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    previewContainer.appendChild(img);
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Function to show a toast notification
+        function showToast(message) {
+            // Create toast container if it doesn't exist
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Create toast element
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">Auto Squad</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            
+            // Initialize and show the toast
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
+            
+            // Remove toast after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+        }
+        
+        // Function to edit a car
+        function editCar(carId) {
+            const car = window.DB.cars.getById(carId);
+            if (!car) return;
+            
+            // Populate form with car data
+            document.getElementById('car-id').value = car.id;
+            document.getElementById('car-model').value = car.model;
+            document.getElementById('car-year').value = car.year;
+            document.getElementById('car-owner').value = car.owner;
+            document.getElementById('car-km').value = car.km;
+            document.getElementById('car-price').value = car.price;
+            document.getElementById('car-description').value = car.description;
+            document.getElementById('car-interior-id').value = car.interiorId || '';
+            
+            // Display current image if available
+            const previewContainer = document.getElementById('image-preview');
+            if (car.image) {
+                const imageSrc = car.image.startsWith('car_') 
+                    ? window.DB.fileUtils.getImage(car.image) 
+                    : car.image;
+                
+                previewContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = imageSrc;
+                previewContainer.appendChild(img);
+            } else {
+                previewContainer.innerHTML = '<p class="text-muted">No image selected</p>';
+            }
+            
+            // Set modal title to Edit Car
+            document.getElementById('carModalLabel').textContent = 'Edit Car';
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('carModal'));
+            modal.show();
+        }
+        
+        // Function to delete a car
+        function deleteCar(carId) {
+            document.getElementById('delete-car-id').value = carId;
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+        
+        // Function to render cars, with optional search query filter
+        function renderCars(searchQuery = '') {
+            const cars = window.DB.cars.getAll();
+            const container = document.getElementById('car-container');
+            container.innerHTML = '';
+            
+            // Check if user is admin
+            const currentUser = window.DB.auth.getCurrentUser();
+            const isAdmin = currentUser && currentUser.isAdmin;
+            
+            // Filter cars based on search query if provided
+            const filteredCars = searchQuery 
+                ? cars.filter(car => 
+                    car.model.toLowerCase().includes(searchQuery) || 
+                    car.description.toLowerCase().includes(searchQuery) ||
+                    car.owner.toLowerCase().includes(searchQuery) ||
+                    car.year.toString().includes(searchQuery))
+                : cars;
+            
+            if (filteredCars.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h3>No cars found matching your search</h3>
+                        <p>Try different keywords or browse all available cars</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Function to generate color based on car name for placeholder
+            function generateColorFromText(text) {
+                // Simple hash function
+                let hash = 0;
+                for (let i = 0; i < text.length; i++) {
+                    hash = text.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                // Convert to hex color
+                let color = '#';
+                for (let i = 0; i < 3; i++) {
+                    const value = (hash >> (i * 8)) & 0xFF;
+                    color += ('00' + value.toString(16)).substr(-2);
+                }
+                return color;
+            }
+            
+            // Function to generate placeholder image
+            function generatePlaceholderImage(car) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 300;
+                const ctx = canvas.getContext('2d');
+                
+                // Use car model to generate background color
+                const bgColor = generateColorFromText(car.model);
+                
+                // Create gradient background
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, bgColor);
+                gradient.addColorStop(1, adjustColorBrightness(bgColor, -30));
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add car silhouette
+                drawCarSilhouette(ctx, canvas.width, canvas.height);
+                
+                // Add car model text
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Draw model text
+                const modelText = car.model;
+                const maxWidth = canvas.width - 40;
+                
+                if (ctx.measureText(modelText).width > maxWidth) {
+                    // Split text into multiple lines if it's too long
+                    const words = modelText.split(' ');
+                    const lines = [];
+                    let currentLine = words[0];
+                    
+                    for (let i = 1; i < words.length; i++) {
+                        const testLine = currentLine + ' ' + words[i];
+                        if (ctx.measureText(testLine).width <= maxWidth) {
+                            currentLine = testLine;
+                        } else {
+                            lines.push(currentLine);
+                            currentLine = words[i];
+                        }
+                    }
+                    lines.push(currentLine);
+                    
+                    const lineHeight = 30;
+                    lines.forEach((line, i) => {
+                        const y = canvas.height / 2 - ((lines.length - 1) * lineHeight / 2) + (i * lineHeight);
+                        ctx.fillText(line, canvas.width / 2, y);
+                    });
+                } else {
+                    // Single line text
+                    ctx.fillText(modelText, canvas.width / 2, canvas.height / 2);
+                }
+                
+                // Add year and km
+                ctx.font = '18px Arial';
+                ctx.fillText(`${car.year} • ${car.km.toLocaleString()} km • ${car.owner}`, canvas.width / 2, canvas.height / 2 + 40);
+                
+                // Add price in a badge
+                const priceText = `₹${car.price.toLocaleString()}`;
+                ctx.font = 'bold 22px Arial';
+                const priceWidth = ctx.measureText(priceText).width + 20;
+                
+                // Price badge
+                const badgeX = canvas.width / 2 - priceWidth / 2;
+                const badgeY = canvas.height / 2 + 70;
+                const badgeHeight = 34;
+                
+                // Badge background
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                roundRect(ctx, badgeX, badgeY, priceWidth, badgeHeight, 8, true);
+                
+                // Price text
+                ctx.fillStyle = '#222';
+                ctx.fillText(priceText, canvas.width / 2, badgeY + badgeHeight/2);
+                
+                // Add "Auto Squad" watermark
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.font = 'italic 16px Arial';
+                ctx.fillText('Auto Squad • Premium Pre-owned Cars', canvas.width / 2, canvas.height - 20);
+                
+                return canvas.toDataURL('image/jpeg', 0.9);
+            }
+            
+            // Helper function to draw rounded rectangle
+            function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+                if (typeof radius === 'undefined') {
+                    radius = 5;
+                }
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + width - radius, y);
+                ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                ctx.lineTo(x + width, y + height - radius);
+                ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                ctx.lineTo(x + radius, y + height);
+                ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+                ctx.closePath();
+                if (fill) {
+                    ctx.fill();
+                }
+                if (stroke) {
+                    ctx.stroke();
+                }
+            }
+            
+            // Helper function to draw a car silhouette
+            function drawCarSilhouette(ctx, width, height) {
+                const centerX = width / 2;
+                const centerY = height / 3;
+                const carWidth = width * 0.6;
+                const carHeight = height * 0.2;
+                
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.scale(carWidth / 100, carHeight / 30);
+                
+                // Draw car silhouette
+                ctx.beginPath();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                
+                // Car body
+                ctx.moveTo(-50, 10);
+                ctx.lineTo(-40, 0);
+                ctx.lineTo(-25, -8);
+                ctx.lineTo(20, -8);
+                ctx.lineTo(40, 0);
+                ctx.lineTo(50, 10);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Wheels
+                ctx.beginPath();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.arc(-25, 10, 8, 0, Math.PI * 2);
+                ctx.arc(25, 10, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Windows
+                ctx.beginPath();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.moveTo(-20, -4);
+                ctx.lineTo(-15, -7);
+                ctx.lineTo(15, -7);
+                ctx.lineTo(20, -4);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+            }
+            
+            // Helper function to adjust color brightness
+            function adjustColorBrightness(hex, percent) {
+                // Convert hex to RGB
+                let r = parseInt(hex.substring(1, 3), 16);
+                let g = parseInt(hex.substring(3, 5), 16);
+                let b = parseInt(hex.substring(5, 7), 16);
+
+                // Adjust brightness
+                r = Math.max(0, Math.min(255, r + percent));
+                g = Math.max(0, Math.min(255, g + percent));
+                b = Math.max(0, Math.min(255, b + percent));
+
+                // Convert back to hex
+                return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+            }
+            
+            filteredCars.forEach((car, index) => {
+                const carElement = document.createElement('div');
+                carElement.className = 'outer';
+                carElement.style.animationDelay = `${0.1 * (index % 10)}s`;
+                
+                // Admin controls
+                const adminControlsHtml = isAdmin ? `
+                    <div class="car-admin-controls">
+                        <button class="edit-btn" onclick="editCar('${car.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" onclick="deleteCar('${car.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                ` : '';
+                
+                // Create image element with error handling
+                const imgElement = document.createElement('img');
+                imgElement.className = 'img';
+                imgElement.alt = car.model;
+                imgElement.loading = 'lazy';
+                
+                // Set image source with error handler for fallback
+                imgElement.src = car.image;
+                imgElement.onerror = function() {
+                    // Check if this is already a data URI
+                    if (car.image && car.image.startsWith('data:')) {
+                        // Already base64, no need to regenerate
+                        return;
+                    }
+                    
+                    // Try to convert image name to a base64 cache if we have it
+                    const cachedImage = window.localStorage.getItem('img_cache_' + car.image);
+                    if (cachedImage) {
+                        this.src = cachedImage;
+                        return;
+                    }
+                    
+                    // Generate placeholder
+                    const placeholderSrc = generatePlaceholderImage(car);
+                    this.src = placeholderSrc;
+                    
+                    // Cache the generated placeholder
+                    try {
+                        window.localStorage.setItem('img_cache_' + car.image, placeholderSrc);
+                    } catch (e) {
+                        console.warn('Could not cache image:', e);
+                    }
+                    
+                    this.onerror = null; // Prevent infinite loop
+                };
+                
+                carElement.innerHTML = `
+                    ${adminControlsHtml}
+                `;
+                carElement.appendChild(imgElement);
+                
+                const innerDiv = document.createElement('div');
+                innerDiv.className = 'inner';
+                innerDiv.innerHTML = `
+                    <h1 class="head">${car.model}</h1>
+                    <p class="para">${car.description}</p>
+                    <p class="price">₹${car.price.toLocaleString()}</p>
+                    <p class="details">Year: ${car.year} | ${car.owner} | ${car.km.toLocaleString()} km</p>
+                    <button class="btn" onclick="redirectToInteriorPage('${car.interiorId}')">
+                        <i class="fas fa-car-side me-2"></i> Watch Interior
+                    </button>
+                    <button class="btn btn-secondary ms-2" onclick="view3DModel('${car.model}')">
+                        <i class="fas fa-cube me-2"></i> View 3D Model
+                    </button>
+                `;
+                carElement.appendChild(innerDiv);
+                
+                container.appendChild(carElement);
+            });
+        }
+        
+        // Function to redirect to interior page
+        function redirectToInteriorPage(carId) {
+            window.location.href = `interior.html?car=${carId}`;
+        }
+
+        // Function to view 3D model
+        function view3DModel(carName) {
+            const modalEl = document.getElementById('model3DModal');
+            const container = document.getElementById('model3DContainer');
+            container.innerHTML = '';
+
+            // BMW 5 Series 530D M Sport
+            if (/bmw\s*5.*m.?sport/i.test(carName)) {
+                container.innerHTML = `
+                    <div class="sketchfab-embed-wrapper" style="width:100%;height:100%;">
+                        <iframe title="BMW 5-Series G30 M-sport 2021" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"
+                            allow="autoplay; fullscreen; xr-spatial-tracking"
+                            xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share
+                            style="width:100%;height:480px;min-height:300px;"
+                            src="https://sketchfab.com/models/5758e389e7d146f3a17ac552991ddd7a/embed">
+                        </iframe>
+                    </div>
+                `;
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+                return;
+            }
+
+            // Harley-Davidson Street 750
+            if (/harley.*street.*750/i.test(carName)) {
+                container.innerHTML = `
+                    <div class="sketchfab-embed-wrapper" style="width:100%;height:100%;">
+                        <iframe title="Harley Davidson Street Rod 750" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"
+                            allow="autoplay; fullscreen; xr-spatial-tracking"
+                            xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share
+                            style="width:100%;height:480px;min-height:300px;"
+                            src="https://sketchfab.com/models/d2a6a90886ee4d1797abc8d0268ceefb/embed?ui_theme=dark">
+                        </iframe>
+                    </div>
+                `;
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+                return;
+            }
+
+            // ... (rest of your Three.js code for generic cars, as before)
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

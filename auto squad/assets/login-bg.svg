@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="1200px" viewBox="0 0 800 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="blueGradient">
+      <stop stop-color="#1a4fdf" offset="0%"/>
+      <stop stop-color="#3a86ff" offset="100%"/>
+    </linearGradient>
+    <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="roadGradient">
+      <stop stop-color="#222222" offset="0%"/>
+      <stop stop-color="#333333" offset="100%"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <!-- Background -->
+    <rect width="800" height="1200" fill="url(#blueGradient)"/>
+    
+    <!-- Road -->
+    <path d="M0,800 L800,600 L800,1200 L0,1200 Z" fill="url(#roadGradient)"/>
+    
+    <!-- Road Lines -->
+    <path d="M0,900 L800,700" stroke="#FFFFFF" stroke-width="10" stroke-dasharray="40,60"/>
+    <path d="M0,1000 L800,800" stroke="#FFFFFF" stroke-width="10" stroke-dasharray="40,60"/>
+    <path d="M0,1100 L800,900" stroke="#FFFFFF" stroke-width="10" stroke-dasharray="40,60"/>
+    
+    <!-- Car Silhouettes -->
+    <!-- Car 1 -->
+    <g transform="translate(100, 200) scale(0.4)">
+      <path d="M180,170 L620,170 C640,170 670,210 680,230 L720,320 C730,340 720,360 700,360 L100,360 C80,360 70,340 80,320 L120,230 C130,210 160,170 180,170 Z" fill="#FFFFFF" fill-opacity="0.1"/>
+      <circle fill="#FFFFFF" fill-opacity="0.1" cx="200" cy="360" r="50"/>
+      <circle fill="#FFFFFF" fill-opacity="0.1" cx="600" cy="360" r="50"/>
+      <path d="M190,170 L250,90 L550,90 L610,170" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="10"/>
+      <path d="M250,90 L550,90 L550,170 L250,170 Z" fill="#FFFFFF" fill-opacity="0.1"/>
+      <path d="M260,110 L540,110 L540,150 L260,150 Z" fill="#FFFFFF" fill-opacity="0.2"/>
+    </g>
+    
+    <!-- Car 2 -->
+    <g transform="translate(500, 400) scale(0.5)">
+      <path d="M180,170 L620,170 C640,170 670,210 680,230 L720,320 C730,340 720,360 700,360 L100,360 C80,360 70,340 80,320 L120,230 C130,210 160,170 180,170 Z" fill="#FFFFFF" fill-opacity="0.2"/>
+      <circle fill="#FFFFFF" fill-opacity="0.2" cx="200" cy="360" r="50"/>
+      <circle fill="#FFFFFF" fill-opacity="0.2" cx="600" cy="360" r="50"/>
+      <path d="M190,170 L250,90 L550,90 L610,170" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="10"/>
+      <path d="M250,90 L550,90 L550,170 L250,170 Z" fill="#FFFFFF" fill-opacity="0.2"/>
+      <path d="M260,110 L540,110 L540,150 L260,150 Z" fill="#FFFFFF" fill-opacity="0.3"/>
+    </g>
+    
+    <!-- Decorative Elements -->
+    <circle cx="100" cy="100" r="40" fill="#FFFFFF" fill-opacity="0.1"/>
+    <circle cx="150" cy="150" r="20" fill="#FFFFFF" fill-opacity="0.15"/>
+    <circle cx="700" cy="200" r="30" fill="#FFFFFF" fill-opacity="0.1"/>
+    <circle cx="650" cy="250" r="15" fill="#FFFFFF" fill-opacity="0.15"/>
+    
+    <path d="M0,300 C100,280 200,350 300,330 C400,310 500,380 600,360 C700,340 800,410 900,390" stroke="#FFFFFF" stroke-width="5" stroke-opacity="0.1"/>
+    <path d="M0,330 C100,310 200,380 300,360 C400,340 500,410 600,390 C700,370 800,440 900,420" stroke="#FFFFFF" stroke-width="3" stroke-opacity="0.1"/>
+  </g>
+</svg> 
